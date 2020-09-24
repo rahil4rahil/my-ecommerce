@@ -14,6 +14,31 @@ const config = {
     measurementId: "G-P79NJ85NYN"
   };
 
+
+  export const createUserProfileDocument = async (userAuth, additionalData) => {
+    if (!userAuth)
+      return;
+    
+    const userRef = firestore.doc(`/users/${userAuth.uid}`)
+
+    const user = await userRef.get()
+    const { displayName, email } = userAuth
+    const createdAt = new Date()
+    if (!user.exists) {
+    try {
+        await userRef.set({
+          displayName,
+          email,
+          createdAt,
+          ...additionalData
+        })
+      } catch (error) {
+        console.log('Error Creating User', error.message)
+      }
+    }
+    return userRef 
+  }
+
   firebase.initializeApp(config)
 
   export const auth = firebase.auth()
